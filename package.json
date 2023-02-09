@@ -2,6 +2,7 @@
   "name": "my-test",
   "version": "0.1.0",
   "private": true,
+  "homepage": "http://phucdd.me/",
   "dependencies": {
     "@emotion/react": "^11.10.5",
     "@emotion/styled": "^11.10.5",
@@ -41,7 +42,9 @@
     "test": "craco test",
     "eject": "craco eject",
     "prettier": "cd src && npx prettier --write .",
-    "lint": "eslint . --ext .js,.jsx,.ts,.tsx"
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
   },
   "eslintConfig": {
     "extends": [
