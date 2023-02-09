@@ -67,7 +67,7 @@
   "devDependencies": {
     "@craco/craco": "^7.0.0",
     "@types/react-datepicker": "^4.8.0",
-    "autoprefixer": "^10.4.13",
+    "autoprefixer": "^9.0.0",
     "postcss": "^8.4.21",
     "postcss-cli": "^10.1.0",
     "precss": "^4.0.0",
