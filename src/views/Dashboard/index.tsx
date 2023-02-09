@@ -3,6 +3,7 @@ import CustomTabs from "~/ui-component/tabs/CustomTabs";
 import TabItem from "~/ui-component/tabs/TabItem";
 import Subcription from "~/views/Dashboard/Subcription";
 import Revenue from "~/views/Dashboard/Revenue";
+import { Outlet } from "react-router-dom";
 
 const tabs = [
   {
@@ -62,6 +63,7 @@ export default function Dashboard() {
           {tab.component}
         </div>
       ))}
+      <Outlet />
     </div>
   );
 }

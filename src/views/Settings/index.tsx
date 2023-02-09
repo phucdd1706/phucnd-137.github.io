@@ -5,6 +5,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { HexColorPicker } from "react-colorful";
 import { useFormik } from "formik";
 import * as Yup from "yup";
+import Regex from "~/utils/regex";
 
 // LOCAL IMPORTS
 import useClickOutside from "./useClickOutside";
@@ -24,9 +25,11 @@ export default function Settings() {
       bgColor: "",
     },
     validationSchema: Yup.object({
-      title: Yup.string().required("Required"),
-      email: Yup.string().email("Invalid email address").required("Required"),
-      bgColor: Yup.string().required("Required"),
+      title: Yup.string(),
+      email: Yup.string()
+        .email("Invalid email address")
+        .matches(Regex().email, "Invalid email address"),
+      bgColor: Yup.string(),
     }),
     onSubmit: (values) => {
       console.log(values);
@@ -74,6 +77,12 @@ export default function Settings() {
                     autoComplete="cc-email"
                     className="mt-1 block w-full rounded-md border border-gray-300 py-2 px-3 shadow-sm focus:border-gray-900 focus:outline-none focus:ring-gray-900 sm:text-sm"
                   />
+                  <label
+                    htmlFor="email"
+                    className="text-red-500 text-sm absolute z-10"
+                  >
+                    {formik.errors.email}
+                  </label>
                 </div>
 
                 <div className="col-span-4 sm:col-span-2">

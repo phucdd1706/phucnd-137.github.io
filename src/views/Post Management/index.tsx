@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useEffect } from "react";
 import VisibilityIcon from "@mui/icons-material/Visibility";
 import axiosServices from "~/utils/axios";
 import { classNames } from "~/utils/classNames";
+import { TablePagination } from "@mui/material";
 
 const sample = [
   {
@@ -15,7 +16,8 @@ const sample = [
 
 const PostManagement = () => {
   const [data, setData] = React.useState(sample);
-  const dataURL = "https://jsonplaceholder.typicode.com/posts";
+  const dataURL = "https://jsonplaceholder.typicode.com/posts"; // put to env
+
   const successCallback = (response: any) => {
     console.log(
       "🚀 ~ file: index.tsx:20 ~ successCallback ~ response",
@@ -28,9 +30,53 @@ const PostManagement = () => {
   };
   const getData = async () =>
     await axiosServices.get(dataURL).then(successCallback).catch(errorCallback);
-  console.log("🚀 ~ file: index.tsx:30 ~ data", data);
 
-  React.useEffect(() => {
+  // display 20 data
+  const [page, setPage] = React.useState(0);
+  const [limit, setLimit] = React.useState(10);
+  const [totalPage, setTotalPage] = React.useState(0);
+  const [dataDisplay, setDataDisplay] = React.useState<any[]>([]);
+  const [isAscending, setIsAscending] = React.useState(true);
+
+  const calculateTotalPage = () => {
+    const totalPage = Math.ceil(data.length / limit);
+    setTotalPage(totalPage);
+  };
+
+  const calculateDataDisplay = () => {
+    const dataDisplay = data.slice(page * limit, page * limit + limit);
+    setDataDisplay(dataDisplay);
+  };
+
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeLimit = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setLimit(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  const handleSortByUserId = () => {
+    const sortedData = dataDisplay.sort((a, b) => {
+      if (isAscending) {
+        return a.userId - b.userId;
+      } else {
+        return b.userId - a.userId;
+      }
+    });
+    setDataDisplay(sortedData);
+    setIsAscending(!isAscending);
+  };
+
+  console.log("🚀 ~ file: index.tsx:30 ~ data", dataDisplay);
+
+  useEffect(() => {
+    calculateTotalPage();
+    calculateDataDisplay();
+  }, [data, page, limit]);
+
+  useEffect(() => {
     getData();
   }, []);
   return (
@@ -47,27 +93,40 @@ const PostManagement = () => {
                   <tr>
                     <th
                       scope="col"
-                      className="sticky top-0 z-10 border-b border-gray-300 bg-gray-50 bg-opacity-75 py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter sm:pl-6 lg:pl-8"
+                      className="sticky top-0 z-10 hidden border-b border-gray-300 bg-gray-50 bg-opacity-75 px-3 py-3.5 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter sm:table-cell"
                     >
-                      Name
+                      Id
                     </th>
                     <th
                       scope="col"
                       className="sticky top-0 z-10 hidden border-b border-gray-300 bg-gray-50 bg-opacity-75 px-3 py-3.5 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter sm:table-cell"
                     >
-                      Title
+                      <div className="flex items-center">
+                        User Id
+                        <button onClick={handleSortByUserId}>
+                          <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            className="w-3 h-3 ml-1"
+                            aria-hidden="true"
+                            fill="currentColor"
+                            viewBox="0 0 320 512"
+                          >
+                            <path d="M27.66 224h264.7c24.6 0 36.89-29.78 19.54-47.12l-132.3-136.8c-5.406-5.406-12.47-8.107-19.53-8.107c-7.055 0-14.09 2.701-19.45 8.107L8.119 176.9C-9.229 194.2 3.055 224 27.66 224zM292.3 288H27.66c-24.6 0-36.89 29.77-19.54 47.12l132.5 136.8C145.9 477.3 152.1 480 160 480c7.053 0 14.12-2.703 19.53-8.109l132.3-136.8C329.2 317.8 316.9 288 292.3 288z" />
+                          </svg>
+                        </button>
+                      </div>
                     </th>
                     <th
                       scope="col"
                       className="sticky top-0 z-10 hidden border-b border-gray-300 bg-gray-50 bg-opacity-75 px-3 py-3.5 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter lg:table-cell"
                     >
-                      Email
+                      Title
                     </th>
                     <th
                       scope="col"
                       className="sticky top-0 z-10 border-b border-gray-300 bg-gray-50 bg-opacity-75 px-3 py-3.5 text-left text-sm font-semibold text-gray-900 backdrop-blur backdrop-filter"
                     >
-                      Role
+                      Action
                     </th>
                     <th
                       scope="col"
@@ -78,21 +137,21 @@ const PostManagement = () => {
                   </tr>
                 </thead>
                 <tbody className="bg-white">
-                  {data.map((content, index) => (
+                  {dataDisplay.map((content, index) => (
                     <tr key={index}>
                       <td
                         className={classNames(
-                          index !== data.length - 1
+                          index !== dataDisplay.length - 1
                             ? "border-b border-gray-200"
                             : "",
-                          "whitespace-nowrap py-4 pl-4 pr-3 text-sm font-medium text-gray-900 sm:pl-6 lg:pl-8"
+                          "whitespace-nowrap px-3 py-4 text-sm text-gray-500 hidden sm:table-cell"
                         )}
                       >
                         {content.id}
                       </td>
                       <td
                         className={classNames(
-                          index !== data.length - 1
+                          index !== dataDisplay.length - 1
                             ? "border-b border-gray-200"
                             : "",
                           "whitespace-nowrap px-3 py-4 text-sm text-gray-500 hidden sm:table-cell"
@@ -102,7 +161,7 @@ const PostManagement = () => {
                       </td>
                       <td
                         className={classNames(
-                          index !== data.length - 1
+                          index !== dataDisplay.length - 1
                             ? "border-b border-gray-200"
                             : "",
                           "whitespace-nowrap px-3 py-4 text-sm text-gray-500 hidden lg:table-cell"
@@ -112,7 +171,7 @@ const PostManagement = () => {
                       </td>
                       <td
                         className={classNames(
-                          index !== data.length - 1
+                          index !== dataDisplay.length - 1
                             ? "border-b border-gray-200"
                             : "",
                           "relative whitespace-nowrap px-3 py-4 text-sm font-medium sm:pr-6 lg:pr-8"
@@ -131,6 +190,17 @@ const PostManagement = () => {
               </table>
             </div>
           </div>
+        </div>
+
+        <div className="flex items-center mt-4 mb-6 items-center justify-center">
+          <TablePagination
+            component="div"
+            count={data.length}
+            page={page}
+            onPageChange={handleChangePage}
+            rowsPerPage={limit}
+            onRowsPerPageChange={handleChangeLimit}
+          />
         </div>
       </div>
     </div>
